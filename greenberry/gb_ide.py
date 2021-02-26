@@ -16,7 +16,7 @@ color5 = ["make", "see", "add", "class", "func", "call"]
 class TextLineNumbers(tk.Canvas):
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
-        self.textwidget = None
+        self.textwidget = "None"
 
     def attach(self, text_widget):
         self.textwidget = text_widget
@@ -78,7 +78,8 @@ class MessageBox(tk.simpledialog.Dialog):
     def body(self, master):
         self.frame = tk.Frame(master)
         self.message = tk.Message(self.frame, text=self.messageText)
-        self.btn_cancel = tk.Button(self.frame, text="Cancel", command=self.cancel)
+        self.btn_cancel = tk.Button(
+            self.frame, text="Cancel", command=self.cancel)
         self.bind("<Return>", self.cancel)
 
         self.frame.grid(column=0, row=0, sticky="NSEW")
@@ -138,21 +139,25 @@ class SearchDialog(tk.simpledialog.Dialog):
         self.check_regexp = tk.Checkbutton(
             self.frame_check, text="Use regular expression", var=self.isRegExp
         )
-        self.btn_search = tk.Button(self.frame_btn, text="Find", command=self.search)
+        self.btn_search = tk.Button(
+            self.frame_btn, text="Find", command=self.search)
         self.btn_replace = tk.Button(
             self.frame_btn, text="Replace", command=self.replace
         )
         self.btn_search_and_replace = tk.Button(
             self.frame_btn, text="Find and Replace", command=self.search_and_replace
         )
-        self.btn_cancel = tk.Button(self.frame, text="Cancel", command=self.cancel)
+        self.btn_cancel = tk.Button(
+            self.frame, text="Cancel", command=self.cancel)
 
         # Frame placements
         self.frame.grid(column=0, row=0, sticky="NSEW")
-        self.btn_cancel.grid(column=1, row=1, sticky="E", padx=(4, 8), pady=(4, 8))
+        self.btn_cancel.grid(column=1, row=1, sticky="E",
+                             padx=(4, 8), pady=(4, 8))
 
         self.frame_entry.grid(column=0, row=0)
-        tk.Label(self.frame_entry, text="Find:").grid(column=0, row=0, sticky="W")
+        tk.Label(self.frame_entry, text="Find:").grid(
+            column=0, row=0, sticky="W")
         self.search_entry.grid(column=1, row=0)
         tk.Label(self.frame_entry, text="Replace:").grid(
             column=0, row=1, sticky="W", pady=(6, 12)
@@ -256,11 +261,14 @@ class SearchDialog(tk.simpledialog.Dialog):
                 # If no 'found' tags, then do a search instead
                 self._search(doSearch=True, doReplace=False)
                 return
-            foundStarts = [idx for i, idx in enumerate(foundRanges) if i % 2 == 0]
-            foundEnds = [idx for i, idx in enumerate(foundRanges) if i % 2 == 1]
+            foundStarts = [idx for i, idx in enumerate(
+                foundRanges) if i % 2 == 0]
+            foundEnds = [idx for i, idx in enumerate(
+                foundRanges) if i % 2 == 1]
             for foundStart, foundEnd in zip(foundStarts, foundEnds):
                 self.txt.delete(foundStart, foundEnd)
-                self.txt.insert(foundStart, data["replace_text"], ("replaced",))
+                self.txt.insert(
+                    foundStart, data["replace_text"], ("replaced",))
 
     def search(self, event=0):
         """Command for Search button"""
@@ -301,20 +309,29 @@ class Files(tk.Frame):
         fileMenu = tk.Menu(menubar)
         runMenu = tk.Menu(menubar)
         searchMenu = tk.Menu(menubar)
-        fileMenu.add_command(label="Save", command=self.save_file, accelerator="Ctrl+S")
+        helpMenu = tk.Menu(menubar)
+        fileMenu.add_command(
+            label="Save", command=self.save_file, accelerator="Ctrl+S")
         fileMenu.add_command(
             label="Save As", command=self.save_as_command, accelerator="Ctrl+Shift+S"
         )
-        fileMenu.add_command(label="Open", command=self.open_file, accelerator="Ctrl+O")
+        fileMenu.add_command(
+            label="Open", command=self.open_file, accelerator="Ctrl+O")
         menubar.add_cascade(label="File", menu=fileMenu)
 
-        runMenu.add_command(label="Run", command=self.run_command, accelerator="F5")
+        runMenu.add_command(
+            label="Run", command=self.run_command, accelerator="F5")
         menubar.add_cascade(label="Run", menu=runMenu, command=self.open_file)
 
         searchMenu.add_command(
             label="Find and replace", command=self.search_command, accelerator="Ctrl+F"
         )
         menubar.add_cascade(label="Search", menu=searchMenu)
+
+        helpMenu.add_command(
+            label="Get started", command=self.help_command, accelerator="Ctrl+Z"
+        )
+        menubar.add_cascade(label="Help", menu=helpMenu)
 
         self.bind_all("<F5>", self.run_command)
         self.bind_all("<Control-o>", self.open_file)
@@ -343,6 +360,30 @@ class Files(tk.Frame):
 
         self.first = True
 
+    def help_command(self):
+        self.outwin = tk.Toplevel(root)
+        self.outwin.title("greenBerry IDE - output")
+        self.outwin.geometry("600x640")
+
+        self.txtout = CustomText(self.outwin)
+
+        self.linenumbers2 = TextLineNumbers(self.outwin, width=30)
+        self.linenumbers2.attach(self.txtout)
+
+        self.linenumbers2.pack(side="left", fill="y")
+        self.txtout.pack(fill="both", expand=True)
+
+        self.txtout.insert("end", '''
+        Hello berry!
+        New here? 
+        Let's start by printing hello world as output
+        Type:
+        print HelloWorld!
+
+        Save your file, run and Voila!
+        Congrats on running your first gb program!
+        ''')
+
     def _on_change(self, event):
         self.linenumbers.redraw()
 
@@ -363,14 +404,16 @@ class Files(tk.Frame):
         self.txt.yview_pickplace("insert")
 
     def open_file(self, event=0):
-        self.txt.delete("insert")  # Ctrl+o causes a new line so we need to delete it
+        # Ctrl+o causes a new line so we need to delete it
+        self.txt.delete("insert")
 
         ftypes = [("greenBerry files", "*.gb"), ("All files", "*")]
         file = filedialog.askopenfile(filetypes=ftypes)
 
         if file != None:
             self.file_dir = file.name
-            self.parent.title("greenBerry IDE" + " - " + file.name.replace("/", "\\"))
+            self.parent.title("greenBerry IDE" + " - " +
+                              file.name.replace("/", "\\"))
             self.txt.delete("1.0", "end" + "-1c")
             text = self.read_file(file.name)
             self.txt.insert("end", text)
@@ -404,7 +447,8 @@ class Files(tk.Frame):
             filetypes=(("greenBerry files", "*.gb"), ("All files", "*")),
         )
         if file != None:
-            self.parent.title("greenBerry IDE" + " - " + file.name.replace("/", "\\"))
+            self.parent.title("greenBerry IDE" + " - " +
+                              file.name.replace("/", "\\"))
             self.file_dir = file.name
             data = self.txt.get("1.0", "end" + "-1c")
             file.write(data)
@@ -445,7 +489,8 @@ class Files(tk.Frame):
 
             self.txtout.config(state="normal")
             if not self.first:
-                self.txtout.insert("end", "\n" + "=" * 25 + "NEW RUN" + "=" * 25 + "\n")
+                self.txtout.insert("end", "\n" + "=" * 25 +
+                                   "NEW RUN" + "=" * 25 + "\n")
             else:
                 self.first = False
             self.txtout.insert("end", out)
